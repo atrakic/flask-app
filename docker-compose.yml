@@ -1,0 +1,34 @@
+---
+version: '3.6'
+
+services:
+  flask-app:
+    build: .
+    container_name: flask-app
+    image: ${APP:-flask-app}:${TAG:-latest}
+    environment:
+      - ENV=DEV
+      - REDIS_ENDPOINT=redis
+    ports:
+      - "8080:8080"
+    networks:
+      - redis-net
+    depends_on:
+      - redis
+  redis:
+    container_name: redis
+    image: redis:alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - redis-net
+    restart: always
+
+networks:
+  redis-net:
+volumes:
+  redis_data:
